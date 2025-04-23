@@ -5,7 +5,7 @@ wb.addEventListener('open', () => {
     console.log('WebSocket connection opened');
 });
 button.addEventListener('click', () => {
-    jsonSend = {"message": input.value};
+    jsonSend = {"message": input.value,"type":"message"};
     wb.send(JSON.stringify(jsonSend));
     // wb.send(input.value);
     console.log('Message sent to server');

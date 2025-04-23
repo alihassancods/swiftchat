@@ -1,5 +1,6 @@
 #include "crow.h"
-//#include "crow_all.h"
+// #include "crow_all.h"
+#include "crow/json.h"
 
 int main()
 {
@@ -49,7 +50,8 @@ int main()
     .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary){
             std::cout << "Got the message" << std::endl;
             std::cout << data << std::endl;
-
+            auto json_data = crow::json::load(data);
+            std::cout << json_data["message"] << std::endl;
             });
     //set the port, set the app to run on multiple threads, and run the app
     app.port(18080).multithreaded().run();
