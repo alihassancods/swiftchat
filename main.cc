@@ -15,7 +15,7 @@ class DatabaseController{
             password = pwd;
             server_addr = serveraddr;
             try {
-                pqxx::connection conn("host=172.28.144.1 port=5432 dbname=postgres user=postgres password=1234");
+                pqxx::connection conn("host= port=5432 dbname=postgres user=postgres password=1234");
                 if (conn.is_open()) {
                     std::cout << "Connected successfully 🚀\n";
                 } else {
