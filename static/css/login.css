@@ -1,0 +1,114 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url("discord.svg"); 
+    background-size: cover; 
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh; 
+    margin: 0;
+  }
+  
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .login-box {
+    background-color: #1e2125;
+    color: white;
+    padding: 40px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    width: 600px;
+  }
+  
+  h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  p {
+    margin-bottom: 20px;
+    color: #696969;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  label {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-align: left;
+    color: #a0a0a0;
+  }
+  
+  input {
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: #5560ea;
+  }
+  
+  .forgot-password {
+    text-align: left;
+    font-size: 12px;
+    color: #56ccf2;
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
+  
+  .forgot-password:hover {
+    text-decoration: underline;
+  }
+  
+  .login-btn {
+    padding: 10px;
+    background-color: #5865f2;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  
+  .login-btn:hover {
+    background-color: #4752c4;
+  }
+  
+  .register {
+    font-size: 14px;
+    margin-top: 20px;
+  }
+  
+  .register a {
+    color: #56ccf2;
+    text-decoration: none;
+  }
+  
+  .register a:hover {
+    text-decoration: underline;
+  }
+  
