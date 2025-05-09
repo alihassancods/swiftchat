@@ -1,6 +1,11 @@
 #include "crow.h"
 // #include "crow_all.h"
 #include "crow/json.h"
+#include<iostream>
+#include<string>
+#include<pqxx/pqxx>
+#include<set>
+using namespace std;
 
 class DatabaseController{
     private:
@@ -23,7 +28,6 @@ class DatabaseController{
                 }
             } catch (const std::exception &e) {
                 std::cerr << e.what() << std::endl;
-                return 1;
             }
         }
         ~DatabaseController(){
@@ -52,7 +56,7 @@ class Auth{
         Auth(){
             std::cout << "Authentication Object initialized" << std::endl;        
         }
-        void register(){
+        void signup(){
             // code to register the user
         }
         void login(){
@@ -64,6 +68,7 @@ class Auth{
 };
 int main()
 {
+    set<int> sessions = {1};
     crow::SimpleApp app; //define your crow application
 
     CROW_ROUTE(app, "/")([](){
@@ -75,12 +80,14 @@ int main()
         return page;
     });
 
-    CROW_ROUTE(app, "/greet/<string>")([](std::string name){ // 
-        auto page = crow::mustache::load("fancypage.html"); // 
-        crow::mustache::context ctx ({{"person", name}}); // 
-        return page.render(ctx); //
+    CROW_ROUTE(app, "/communities")([](){
+        auto page = crow::mustache::load_text("communities-list.html");
+        return page;
     });
-
+    CROW_ROUTE(app,"/community/<string>")
+    ([](string communityId){
+        return communityId;
+    });
     CROW_ROUTE(app,"/add/<int>/<int>")
     ([](int int1,int int2){
         return std::to_string(int1+int2);
@@ -110,9 +117,9 @@ int main()
             std::cout << "Got the message" << std::endl;
             std::cout << data << std::endl;
             auto json_data = crow::json::load(data);
-            std::cout << json_data["message"] << std::endl
-            
+            std::cout << json_data["message"] << std::endl;
             });
+        
     //set the port, set the app to run on multiple threads, and run the app
     app.port(18080).multithreaded().run();
 }
