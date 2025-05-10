@@ -22,6 +22,11 @@
 
         socket.onopen = function () {
             console.log("WebSocket connected");
+            const payload = {
+                type : "init"
+            };
+
+            socket.send(JSON.stringify(payload));
         };
 
         socket.onmessage = function (event) {
@@ -34,6 +39,14 @@
                 appendMessage("✅ Connected. Your token: " + jwtToken);
             } else if (data.message) {
                 appendMessage(`🔵 ${data.from}: ${data.message}`);
+            } else if (data.type == "token"){
+                const token = data.token;
+                if (token) {
+                    jwtToken = token;
+                    appendMessage("✅ Token received: " + jwtToken);
+                } else {
+                    appendMessage("❌ Token not received.");
+                }
             }
         };
 
