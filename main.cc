@@ -49,14 +49,25 @@ public:
 
 int main() {
     crow::SimpleApp app;
-
+    CROW_ROUTE(app, "/signup")([]() {
+        auto page = crow::mustache::load_text("signup.html");
+        return page;
+    });
+    CROW_ROUTE(app, "/login")([]() {
+        auto page = crow::mustache::load_text("login.html");
+        return page;
+    });
+    CROW_ROUTE(app, "/profile")([]() {
+        auto page = crow::mustache::load_text("communities-list.html");
+        return page;
+    });
     CROW_ROUTE(app, "/communities")([]() {
         auto page = crow::mustache::load_text("communities-list.html");
         return page;
     });
 
     CROW_ROUTE(app, "/chat")([]() {
-        auto page = crow::mustache::load_text("testConnection.html");
+        auto page = crow::mustache::load_text("index.html");
         return page;
     });
 
@@ -115,14 +126,15 @@ int main() {
 
             std::lock_guard<std::mutex> lock(sessions_mutex);
             for (const auto& session : sessions) {
-                if (session.jwtToken != sender_token) {
+                if (session.jwtToken == sender_token) {
+                    std::cout << "Skipping sender session: " << session.jwtToken << std::endl;
+                    
+                } else {
                     json broadcast_message;
                     broadcast_message["from"] = session.name;
                     broadcast_message["message"] = message_content;
                     session.connection->send_text(broadcast_message.dump());
                     std::cout << "Broadcasted message to: " << session.jwtToken << std::endl;
-                } else {
-                    std::cout << "Skipping sender session: " << session.jwtToken << std::endl;
                 }
             }
         }

@@ -10,7 +10,7 @@
     rel="stylesheet"
 />
   </head>
-  <body>
+  <body class="dark-mode">
     <div class="flex">
     <div class="flex flex-col justify-between h-[753px] w-[4%]">
         <div class="flex flex-col p-4">
@@ -80,9 +80,9 @@
         </div>
       
         <!-- Chat Body -->
-        <div class="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+        <div id="chatbody" class="flex-1 overflow-y-auto px-4 py-6 space-y-4">
           <div class="text-center text-xs text-gray-500">9/23/2024</div>
-          <div class="w-300 max-w-[1100px] space-y-3 flex flex-col">
+          <div id="chatbox" class="w-300 max-w-[1100px] space-y-3 flex flex-col">
             <!-- Incoming Messages -->
             <div class="bg-white rounded-lg px-4 py-2 max-w-[40%] shadow">
               <p class="text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum eum odit quo doloribus voluptatibus magnam autem, quam animi quas fugiat?</p>
@@ -100,11 +100,12 @@
         <div class="flex items-center p-3 bg-white border-t border-gray-300">
           <button class="text-xl px-2"><i class="ri-emotion-happy-line"></i></button>
           <button class="text-xl px-2"><i class="ri-attachment-line"></i></button>
-          <input type="text" placeholder="Type a message" class="flex-1 border-none outline-none px-3 py-2 rounded-lg bg-gray-100 mx-2" />
+          <input type="text" id="message-box" placeholder="Type a message" class="flex-1 border-none outline-none px-3 py-2 rounded-lg bg-gray-100 mx-2" />
           <button class="text-xl px-2"><i class="ri-mic-line"></i></button>
         </div>
       
 </div>  
-</div>  
+</div>
+<script src="static/inbox.js"></script>  
 </body>
 </html>
