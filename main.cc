@@ -8,6 +8,7 @@ using json = nlohmann::json;
 #include <memory>
 #include <mutex>
 #include <random>
+#include<cstdlib>
 
 using namespace std;
 class Translator{
@@ -16,8 +17,9 @@ class Translator{
     public:
         string translate(string textToTranslate){
             // logic implemented here to translate
+            return "Pakistan Zindabad!!!!!!!!!!!!!!!!!!!!!!";
         }
-}
+};
 class DatabaseController{
     private:
         string username;
@@ -29,19 +31,12 @@ class DatabaseController{
             username = uname;
             dbname=dbasename;
             password = pwd;
-            server_addr = serveraddr;
+            server_addr = system("hostname -I");
+            std::cout << server_addr << std::endl;
             try {
-                pqxx::connection conn("host=172.28.144.1 port=5432 dbname=postgres user=postgres password=1234");
+                pqxx::connection conn("host=172.28.146.182 port=5432 dbname=swiftchat user=postgres password=1234");
                 if (conn.is_open()) {
                     std::cout << "Connected successfully 🚀\n";
-                    pqxx::work txn(conn);
-                    txn.exec("CREATE TABLE IF NOT EXISTS students(id SERIAL PRIMARY KEY, name TEXT)");
-
-                    // Commit transaction
-                    txn.commit();
-
-                    std::cout << "Table created successfully.\n";
-                    conn.disconnect();
                 } else {
                     std::cout << "Failed to connect ❌\n";
                 }
@@ -89,19 +84,80 @@ std::mutex sessions_mutex;
 
 class Auth {
 private:
-    string username;
-    string password;
-    string sessionToken;
+    // string username;
+    // string password;
+    // string sessionToken;
+    std::string extract_username(string email) {
+    return email.substr(0, email.find('@'));
+}
+std::string generate_jwt(const std::string &email, const std::string &secret, bool permanent) {
+    auto token = jwt::create()
+        .set_issuer("auth-service")
+        .set_type("JWS")
+        .set_subject(email)
+        .set_payload_claim("perm", jwt::claim(std::string(permanent ? "1" : "0")))
+        .set_issued_at(std::chrono::system_clock::now())
+        .sign(jwt::algorithm::hs256{secret});
+    return token;
+}
+
+std::string generate_session_token(const std::string &email, const std::string &secret) {
+    auto session_token = jwt::create()
+        .set_issuer("auth-service")
+        .set_type("JWS")
+        .set_subject(email)
+        .set_payload_claim("perm", jwt::claim(std::string("0")))  // session token
+        .set_issued_at(std::chrono::system_clock::now())
+        .set_expires_at(std::chrono::system_clock::now() + std::chrono::minutes{60})
+        .sign(jwt::algorithm::hs256{secret});
+    return session_token;
+}
 public:
     Auth() {
         std::cout << "Authentication Object initialized" << std::endl;
     }
     void signup(string emailValue, string passwordValue) {
-        // Go and Make the entry with this email and set it as password as well
-        // Generate its unique token as well
+        try{
+            pqxx::connection conn("host=10.8.34.73 port=5432 dbname=swiftchat user=postgres password=1234");
+            string username = extract_username(emailValue);
+            string master_token = generate_jwt(emailValue,passwordValue,true);
+            cout << master_token << endl;
+            pqxx::work txn(conn);
+        txn.exec_params(
+            "INSERT INTO users (email, password, username, master_token) VALUES ($1, $2, $3, $4)",
+            emailValue, passwordValue, username, master_token
+        );
 
+        txn.commit();
+        std::cout << "User signed up successfully.\n";
+        std::cout << "Permanent token (store securely):\n" << master_token << std::endl;
+        } catch (const std::exception &e) {
+        std::cerr << "Signup failed: " << e.what() << std::endl;
     }
-    void login() {}
+        
+    }
+    string login(string emailValue, string passwordValue) {
+        try{
+            pqxx::connection conn("host=10.8.34.73 port=5432 dbname=swiftchat user=postgres password=1234");
+            pqxx::work txn(conn);
+            pqxx::result r = txn.exec_params(
+            "SELECT * FROM users WHERE email = $1", emailValue
+        );
+        std::string stored_password = r[0][0].as<std::string>();
+        std::string masterToken = r[0]["master_token"].as<std::string>();
+        if (r.empty()) {
+            std::cout << "Login failed: user not found.\n";
+            return "Login Failed";
+        }
+
+        std::string session_token = generate_session_token(emailValue, masterToken);
+        std::cout << "Login successful.\nSession token:\n" << session_token << std::endl;
+        return session_token;
+        } catch (const std::exception &e) {
+        std::cerr << "Login error: " << e.what() << '\n';
+        return "LoginError Catched";
+    }
+    }
     ~Auth() {
         std::cout << "Authentication Object Shutting Down." << std::endl;
     }
@@ -109,6 +165,8 @@ public:
 
 int main() {
     crow::SimpleApp app;
+    Auth auth_controller;
+    DatabaseController controller("postgres","swiftchat","1234","");
     CROW_ROUTE(app, "/signup")([]() {
         auto page = crow::mustache::load_text("signup.html");
         return page;
