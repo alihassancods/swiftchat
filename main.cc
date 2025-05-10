@@ -1,14 +1,70 @@
+//  g++ -std=c++17 -o websocket_app main.cc -lcrypto -pthread -lpqxx -lpq
 #include "crow.h"
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 #include "jwt-cpp/jwt.h"
 #include <unordered_set>
+#include<pqxx/pqxx>
 #include <memory>
 #include <mutex>
 #include <random>
 
 using namespace std;
+class Translator{
+    private:
+        string API_KEY;
+    public:
+        string translate(string textToTranslate){
+            // logic implemented here to translate
+        }
+}
+class DatabaseController{
+    private:
+        string username;
+        string dbname;
+        string password;
+        string server_addr;
+    public:
+        DatabaseController(string uname, string dbasename,string pwd,string serveraddr){
+            username = uname;
+            dbname=dbasename;
+            password = pwd;
+            server_addr = serveraddr;
+            try {
+                pqxx::connection conn("host=172.28.144.1 port=5432 dbname=postgres user=postgres password=1234");
+                if (conn.is_open()) {
+                    std::cout << "Connected successfully 🚀\n";
+                    pqxx::work txn(conn);
+                    txn.exec("CREATE TABLE IF NOT EXISTS students(id SERIAL PRIMARY KEY, name TEXT)");
 
+                    // Commit transaction
+                    txn.commit();
+
+                    std::cout << "Table created successfully.\n";
+                    conn.disconnect();
+                } else {
+                    std::cout << "Failed to connect ❌\n";
+                }
+            } catch (const std::exception &e) {
+                std::cerr << e.what() << std::endl;
+            }
+        }
+        ~DatabaseController(){
+            std::cout << "Connection Stopped" << std::endl;        
+        }
+        void create_table(string tableNm){
+            // code to create table in database
+        }
+        void fetch_table_data(string tableNm){
+            // code to create table in database
+        }
+        void insert_data(string tableNm,string data){
+            // code to insert data into table in database
+        }
+        void delete_table(string tableNm){
+            // code to create table in database
+        }
+};
 // Struct to hold connection, token, and name
 struct Session {
     crow::websocket::connection* connection;
@@ -40,7 +96,11 @@ public:
     Auth() {
         std::cout << "Authentication Object initialized" << std::endl;
     }
-    void signup() {}
+    void signup(string emailValue, string passwordValue) {
+        // Go and Make the entry with this email and set it as password as well
+        // Generate its unique token as well
+
+    }
     void login() {}
     ~Auth() {
         std::cout << "Authentication Object Shutting Down." << std::endl;
