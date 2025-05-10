@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JWT WebSocket Chat</title>
+    <style>
+        body { font-family: Arial; margin: 30px; }
+        #messages { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
+        input, button { padding: 8px; font-size: 1em; }
+    </style>
+</head>
+<body>
+    <h2>WebSocket JWT Chat</h2>
+    <div id="messages"></div>
+    <br>
+    <input type="text" id="msgInput" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:18080/ws?name=Ali");
+        let jwtToken = null;
+
+        socket.onopen = function () {
+            console.log("WebSocket connected");
+        };
+
+        socket.onmessage = function (event) {
+            let data = JSON.parse(event.data);
+            console.log("Received:", data);
+            // If it's the first token response
+            if (data.token && !jwtToken) {
+                jwtToken = data.token;
+                console.log("Assigned JWT:", jwtToken);
+                appendMessage("✅ Connected. Your token: " + jwtToken);
+            } else if (data.message) {
+                appendMessage(`🔵 ${data.from}: ${data.message}`);
+            }
+        };
+
+        socket.onclose = function () {
+            appendMessage("❌ Connection closed.");
+        };
+
+        function sendMessage() {
+            const input = document.getElementById("msgInput");
+            const msg = input.value.trim();
+
+            if (!msg || !jwtToken) return;
+
+            const payload = {
+                token: jwtToken,
+                message: msg
+            };
+
+            socket.send(JSON.stringify(payload));
+            appendMessage(`🟢 You: ${msg}`);
+            input.value = '';
+        }
+
+        function appendMessage(msg) {
+            const box = document.getElementById("messages");
+            box.innerHTML += `<div>${msg}</div>`;
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+</body>
+</html>
