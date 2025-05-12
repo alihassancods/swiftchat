@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Translate API Test</title>
+</head>
+<body>
+  <h2>Translate Text to English</h2>
+  <textarea id="inputText" rows="4" cols="50" placeholder="Enter text to translate..."></textarea>
+  <br><br>
+  <button onclick="translateText()">Translate</button>
+  <h3>Result:</h3>
+  <pre id="output"></pre>
+
+  <script>
+  async function translateText() {
+    const input = document.getElementById("inputText").value;
+    const output = document.getElementById("output");
+    // const encodedText = encodeURIComponent(input);
+    const response = await fetch(`http://127.0.0.1:18080/translate?text=${input}`);
+      
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error("Server error: " + errorText);
+    }
+
+      const result = await response.json();
+      console.log(result);
+      console.log(result["text"]);
+      output.textContent = JSON.stringify(result,null,2);
+    }
+
+  </script>
+</body>
+</html>

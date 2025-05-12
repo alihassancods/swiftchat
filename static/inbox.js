@@ -43,3 +43,4 @@ input.addEventListener("keydown", (e) => {
     messageBoxContainer.scrollTop = messageBoxContainer.scrollHeight;
     input.value = "";
   }
+
