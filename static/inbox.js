@@ -6,10 +6,12 @@ const translateButtons = document.querySelectorAll("#translate-button")
 const username = "Ali";
 const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf("/"));
 const sendButton = document.querySelector('.send');
-
-
+const baseOrigin = window.location.origin; // e.g., http://localhost:18080
+// Derive WebSocket URL from HTTP origin
+const baseWebSocketUrl = baseOrigin.replace(/^http/, 'ws');
+const wsEndpoint = `${baseWebSocketUrl}/ws`;
 var token;
-const wb = new WebSocket('ws://localhost:18080/ws');
+const wb = new WebSocket(wsEndpoint);
 wb.addEventListener('open', () => {
     console.log('WebSocket connection opened');
     wb.send(JSON.stringify({"type":"init"}));

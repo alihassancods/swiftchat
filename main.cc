@@ -135,46 +135,6 @@ private:
 };
 
 
-class DatabaseController{
-    private:
-        string username;
-        string dbname;
-        string password;
-        string server_addr;
-    public:
-        DatabaseController(string uname, string dbasename,string pwd,string serveraddr){
-            username = uname;
-            dbname=dbasename;
-            password = pwd;
-            server_addr = system("hostname -I");
-            std::cout << server_addr << std::endl;
-            try {
-                pqxx::connection conn("host=" + IP_ADDR + " port=5432 dbname=swiftchat user=postgres password=1234");
-                if (conn.is_open()) {
-                    std::cout << "Connected successfully 🚀\n";
-                } else {
-                    std::cout << "Failed to connect ❌\n";
-                }
-            } catch (const std::exception &e) {
-                std::cerr << e.what() << std::endl;
-            }
-        }
-        ~DatabaseController(){
-            std::cout << "Connection Stopped" << std::endl;        
-        }
-        void create_table(string tableNm){
-            // code to create table in database
-        }
-        void fetch_table_data(string tableNm){
-            // code to create table in database
-        }
-        void insert_data(string tableNm,string data){
-            // code to insert data into table in database
-        }
-        void delete_table(string tableNm){
-            // code to create table in database
-        }
-};
 // Struct to hold connection, token, and name
 struct Session {
     crow::websocket::connection* connection;
@@ -281,18 +241,76 @@ public:
     }
 };
 
+class DatabaseController{
+    private:
+        string username;
+        string dbname;
+        string password;
+        string server_addr;
+    public:
+        DatabaseController(string uname, string dbasename,string pwd,string serveraddr){
+            username = uname;
+            dbname=dbasename;
+            password = pwd;
+            server_addr = system("hostname -I");
+            std::cout << server_addr << std::endl;
+            try {
+                pqxx::connection conn("host=" + IP_ADDR + " port=5432 dbname=swiftchat user=postgres password=1234");
+                if (conn.is_open()) {
+                    std::cout << "Connected successfully 🚀\n";
+                } else {
+                    std::cout << "Failed to connect ❌\n";
+                }
+            } catch (const std::exception &e) {
+                std::cerr << e.what() << std::endl;
+            }
+        }
+        ~DatabaseController(){
+            std::cout << "Connection Stopped" << std::endl;        
+        }
+        void create_table(string tableNm){
+            // code to create table in database
+        }
+        void fetch_table_data(string tableNm){
+            // code to create table in database
+        }
+        void insert_data(string tableNm,string data){
+            // code to insert data into table in database
+        }
+        void delete_table(string tableNm){
+            // code to create table in database
+        }
+};
+
+
 int main() {
     crow::SimpleApp app;
     Auth auth_controller;
     DatabaseController controller("postgres","swiftchat","1234","");
     CROW_ROUTE(app, "/signup")([]() {
         auto page = crow::mustache::load_text("signup.html");
-        return page;
+
+        // Create a response object and set Content-Type header to text/html
+        crow::response res;
+        res.set_header("Content-Type", "text/html");
+        
+        // Return the response with the rendered HTML page
+        res.write(page);
+        
+        return res;
     });
 
     CROW_ROUTE(app, "/login")([]() {
         auto page = crow::mustache::load_text("login.html");
-        return page;
+
+        // Create a response object and set Content-Type header to text/html
+        crow::response res;
+        res.set_header("Content-Type", "text/html");
+        
+        // Return the response with the rendered HTML page
+        res.write(page);
+        
+        return res;
     });
 
     CROW_ROUTE(app, "/profile")([]() {
@@ -306,8 +324,17 @@ int main() {
     });
 
     CROW_ROUTE(app, "/chat")([](const crow::request& req) {
+        // Load the login.html template
         auto page = crow::mustache::load_text("index.html");
-        return page;
+
+        // Create a response object and set Content-Type header to text/html
+        crow::response res;
+        res.set_header("Content-Type", "text/html");
+        
+        // Return the response with the rendered HTML page
+        res.write(page);
+        
+        return res;
     });
 
     CROW_ROUTE(app, "/translate")
