@@ -5,6 +5,8 @@ const messageBoxContainer = document.querySelector('#chatbody');
 const translateButtons = document.querySelectorAll("#translate-button")
 const username = "Ali";
 const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf("/"));
+const sendButton = document.querySelector('.send');
+
 
 var token;
 const wb = new WebSocket('ws://localhost:18080/ws');
@@ -37,6 +39,11 @@ input.addEventListener("keydown", (e) => {
         console.log('Message sent to server');
     }
   });
+sendButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        sendMessage(input.value,token);
+        console.log('Message sent to server');
+    });
 
   function sendMessage(message,tokenValue){
     if(message == ""){

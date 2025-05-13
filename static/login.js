@@ -53,6 +53,7 @@ async function login(email, password) {
         // Optionally store token:
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.username);
+        
         return data.status;
 
     } catch (error) {
