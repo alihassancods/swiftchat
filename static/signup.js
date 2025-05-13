@@ -4,29 +4,29 @@ const signupButton = document.querySelector(".login-btn");
 const warningSection = document.querySelector("#warning");
 const errorSection = document.querySelector("#error");
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf("/"));
 
 function isValidEmail(email) {
   return emailRegex.test(email);
 }
-signupButton.addEventListener("click",()=>{
+signupButton.addEventListener("click",async ()=>{
     if(!isValidEmail(emailField.value)){
         warningSection.textContent = "Invalid Email! Please enter correct one";
     }
     else{
         warningSection.textContent = "";
-        data = JSON.dump(signup(emailField.textContent,passwordField.textContent));
-        console.log(data);
-        if(!data.status){
-            errorSection.textContent = "Signup failed! Please Try again";
+        const status = await signup(emailField.value,passwordField.value);
+        if(status == 'success'){
+            errorSection.textContent = "Signup completed!";
+            window.location.href = `${baseUrl}/login`;
         }
         else{
-            errorSection.textContent = "Signup completed!";
-
-        }
+            errorSection.textContent = "Signup failed! Please Try again";
+        }   
     }
 })
 async function signup(email, password) {
-    const url = 'http://127.0.0.1:18080/signup'; // 🔁 Replace with your actual login endpoint
+    const url = `${baseUrl}/signup`; // 🔁 Replace with your actual login endpoint
 
     const payload = {
         email: email,
@@ -50,7 +50,7 @@ async function signup(email, password) {
         const data = await response.json();
         console.log('Signups successful:', data);
         // Optionally store token:
-        return data;
+        return `${data.status}`;
 
     } catch (error) {
         console.error('Error during login:', error);

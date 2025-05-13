@@ -4,6 +4,8 @@ const messageBox = document.querySelector('#chatbox');
 const messageBoxContainer = document.querySelector('#chatbody');
 const translateButtons = document.querySelectorAll("#translate-button")
 const username = "Ali";
+const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf("/"));
+
 var token;
 const wb = new WebSocket('ws://localhost:18080/ws');
 wb.addEventListener('open', () => {
@@ -63,7 +65,7 @@ document.addEventListener("click", function(event) {
     const messageTextElem = messageContainer.querySelector(".text-sm");
     const originalText = messageTextElem.textContent;
 
-    fetch(`http://127.0.0.1:18080/translate?text=${originalText}`)
+    fetch(`${baseUrl}/translate?text=${originalText}`)
       .then(res => res.json())
       .then(data => {
         messageTextElem.textContent = data.text || "(Translation failed)";
