@@ -13,10 +13,15 @@ wb.addEventListener('open', () => {
 wb.addEventListener('message', (event) => {
     const data = JSON.parse(event.data);
     if (data.message != undefined) {
-        messageBox.innerHTML += `<div class="message bg-[#f1f1f1] rounded-lg px-4 py-2 max-w-[40%] shadow">
+        messageBox.innerHTML += `
+            <div class="message bg-[#f1f1f1] rounded-lg px-4 py-2 max-w-[40%] shadow">
+
               <p class="text-sm">${data.message}</p>
-              <span class="text-xs text-gray-500 block text-right">2:55 AM</span>
-            </div>`;
+              <span class="text-xs text-gray-500 block text-right relative float-right">2:55 AM</span>
+              <div class="text-xs text-blue-600 text-left">
+              <a class="hover:underline translate-button" href="">Translate</a></div>
+            </div>
+              `;
         messageBoxContainer.scrollTop = messageBoxContainer.scrollHeight;
     } else if (data.type == "token") {
         console.log('Tokens received:', data.token);
@@ -37,33 +42,35 @@ input.addEventListener("keydown", (e) => {
     }
     jsonSend = {"message": input.value,"token": tokenValue};
     wb.send(JSON.stringify(jsonSend));
-    messageBox.innerHTML += `<div class=" message bg-[#dcf8c6] rounded-lg px-4 py-2 max-w-[40%] ml-auto shadow">
+    messageBox.innerHTML += `
+            <div class=" message bg-[#dcf8c6] rounded-lg px-4 py-2 max-w-[40%] ml-auto shadow">
               <p class="text-sm">${message}</p>
-              <span class="text-xs text-gray-500 block text-right">2:55 AM</span>
-            </div>`;
+              <span class="text-xs text-gray-500 block text-right relative float-right">2:55 AM</span>
+              <div class="text-xs text-blue-600 text-left">
+              <a class="hover:underline translate-button" >Translate</a></div>
+            </div>
+              `;
     messageBoxContainer.scrollTop = messageBoxContainer.scrollHeight;
     input.value = "";
   }
-   translateButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      const container = button.closest(".message");
-      const messageTextElem = container.querySelector(".text-sm");
-      const originalText = messageTextElem.textContent;
-      console.log(originalText);
-      messageTextElem.textContent = translate(originalText);
-    });
-});
+
   
-  async function translate(textToTranslate){
-      try {
-        const response = await fetch(`http://127.0.0.1:18080/translate?text=${textToTranslate}`);
+document.addEventListener("click", function(event) {
+    console.log("Clicked:", event.target);
+  if (event.target.classList.contains("translate-button")) {
+    const button = event.target;
+    const messageContainer = button.closest(".message");
+    const messageTextElem = messageContainer.querySelector(".text-sm");
+    const originalText = messageTextElem.textContent;
 
-        if (!response.ok) {
-          throw new Error(`Server responded with status ${response.status}`);
-        }
-
-        return JSON.stringify(data, null, 2);
-      } catch (error) {
-        return `Error: ${error.message}`;
-      }
-    }
+    fetch(`http://127.0.0.1:18080/translate?text=${originalText}`)
+      .then(res => res.json())
+      .then(data => {
+        messageTextElem.textContent = data.text || "(Translation failed)";
+      })
+      .catch(err => {
+        console.error("Fetch error:", err);
+        messageTextElem.textContent = "(Translation error)";
+      });
+  }
+});

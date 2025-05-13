@@ -303,7 +303,7 @@ int main() {
         return page;
     });
 
-    CROW_ROUTE(app, "/chat")([]() {
+    CROW_ROUTE(app, "/chat")([](const crow::request& req) {
         auto page = crow::mustache::load_text("index.html");
         return page;
     });

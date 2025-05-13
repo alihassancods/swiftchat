@@ -1,5 +1,6 @@
+
 async function login(username, password) {
-    const url = '/login'; // 🔁 Replace with your actual login endpoint
+    const url = 'http://127.0.0.1:18080/login'; // 🔁 Replace with your actual login endpoint
 
     const payload = {
         username: username,
@@ -22,7 +23,9 @@ async function login(username, password) {
 
         const data = await response.json();
         console.log('Login successful:', data);
-        // Optionally store token: localStorage.setItem('token', data.token);
+        // Optionally store token:
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('username', data.username);
         return data;
 
     } catch (error) {
