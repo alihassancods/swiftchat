@@ -1,9 +1,9 @@
 
-async function login(username, password) {
+async function login(email, password) {
     const url = 'http://127.0.0.1:18080/login'; // 🔁 Replace with your actual login endpoint
 
     const payload = {
-        username: username,
+        email: email,
         password: password
     };
 

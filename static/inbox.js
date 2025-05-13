@@ -19,7 +19,7 @@ wb.addEventListener('message', (event) => {
               <p class="text-sm">${data.message}</p>
               <span class="text-xs text-gray-500 block text-right relative float-right">2:55 AM</span>
               <div class="text-xs text-blue-600 text-left">
-              <a class="hover:underline translate-button" href="">Translate</a></div>
+              <a class="hover:underline translate-button">Translate</a></div>
             </div>
               `;
         messageBoxContainer.scrollTop = messageBoxContainer.scrollHeight;
@@ -47,7 +47,7 @@ input.addEventListener("keydown", (e) => {
               <p class="text-sm">${message}</p>
               <span class="text-xs text-gray-500 block text-right relative float-right">2:55 AM</span>
               <div class="text-xs text-blue-600 text-left">
-              <a class="hover:underline translate-button" >Translate</a></div>
+              <a class="hover:underline translate-button">Translate</a></div>
             </div>
               `;
     messageBoxContainer.scrollTop = messageBoxContainer.scrollHeight;

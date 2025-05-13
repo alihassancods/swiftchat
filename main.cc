@@ -1,4 +1,5 @@
 //  g++ -std=c++17 -o websocket_app main.cc -lcurl -lcrypto -pthread -lpqxx -lpq 
+// net start postgresql-x64-17
 #include "crow.h"
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -148,7 +149,7 @@ class DatabaseController{
             server_addr = system("hostname -I");
             std::cout << server_addr << std::endl;
             try {
-                pqxx::connection conn("host=172.28.146.182 port=5432 dbname=swiftchat user=postgres password=1234");
+                pqxx::connection conn("host=" + IP_ADDR + " port=5432 dbname=swiftchat user=postgres password=1234");
                 if (conn.is_open()) {
                     std::cout << "Connected successfully 🚀\n";
                 } else {
@@ -230,9 +231,9 @@ public:
     Auth() {
         std::cout << "Authentication Object initialized" << std::endl;
     }
-    void signup(string emailValue, string passwordValue) {
+    string signup(string emailValue, string passwordValue) {
         try{
-            pqxx::connection conn("host=" + IP_ADDR + "port=5432 dbname=swiftchat user=postgres password=1234");
+            pqxx::connection conn("host=" + IP_ADDR + " port=5432 dbname=swiftchat user=postgres password=1234");
             string username = extract_username(emailValue);
             string master_token = generate_jwt(emailValue,passwordValue,true);
             cout << master_token << endl;
@@ -245,19 +246,20 @@ public:
         txn.commit();
         std::cout << "User signed up successfully.\n";
         std::cout << "Permanent token (store securely):\n" << master_token << std::endl;
+        return "success";
         } catch (const std::exception &e) {
-        std::cerr << "Signup failed: " << e.what() << std::endl;
+         return "Signup failed: $1",e.what();
     }
         
     }
     string login(string emailValue, string passwordValue) {
         try{
-            pqxx::connection conn("host=" + IP_ADDR + "port=5432 dbname=swiftchat user=postgres password=1234");
+            pqxx::connection conn("host=" + IP_ADDR + " port=5432 dbname=swiftchat user=postgres password=1234");
             pqxx::work txn(conn);
             pqxx::result r = txn.exec_params(
             "SELECT * FROM users WHERE email = $1", emailValue
         );
-        std::string stored_password = r[0][0].as<std::string>();
+        std::string stored_password = r[0]["password"].as<std::string>();
         std::string masterToken = r[0]["master_token"].as<std::string>();
         if (r.empty()) {
             std::cout << "Login failed: user not found.\n";
@@ -271,7 +273,7 @@ public:
         return session_token;
         } catch (const std::exception &e) {
         std::cerr << "Login error: " << e.what() << '\n';
-        return "LoginError Catched";
+        return "LoginError";
     }
     }
     ~Auth() {
@@ -353,28 +355,29 @@ int main() {
             CROW_LOG_INFO << "Received login for user: " << email;
             string token = auth_controller.login(email,password);
             string username = "";
+            crow::response response;
+
             if(token == "Invalid Credentials"){
                 std::cout << "Invalid Credentials" << std::endl;
+                json response_json = {
+                {"status", "invalid"}
+            };
+            response.set_header("Content-Type", "application/json");
+                response.body = response_json.dump();
             }
             else{
                 std::cout << "User successfully logged in" << std::endl;
-                crow::response response;
-                response.code = 200;
-                response.set_header("Content-Type", "application/json");
-                response.body = "User successfully logged in";
-                return response;
-            }
-            // Build response using nlohmann::json (optional)
-            json response_json = {
+                json response_json = {
                 {"status", "success"},
                 {"user", username},
                 {"session_token",token}
             };
-            crow::response res;
-            res.code = 200;
-            res.set_header("Content-Type", "application/json");
-            res.body = response_json.dump();
-            return res;
+                response.code = 200;
+                response.set_header("Content-Type", "application/json");
+                response.body = response_json.dump();
+            }
+            // Build response using nlohmann::json (optional)
+                return response;
         }
         catch (const std::exception& e) {
     return crow::response(400, std::string("Error: ") + e.what());
@@ -391,23 +394,12 @@ int main() {
             std::string email = request_json.at("email").get<std::string>();
             std::string password = request_json.at("password").get<std::string>();
 
-            CROW_LOG_INFO << "Received login for user: " << email;
-            string token = auth_controller.login(email,password);
-            if(token == "Invalid Credentials"){
-                std::cout << "Invalid Credentials" << std::endl;
-            }
-            else{
-                std::cout << "User successfully logged in" << std::endl;
-                crow::response response;
-                response.code = 200;
-                response.set_header("Content-Type", "application/json");
-                response.body = "User successfully logged in";
-                return response;
-            }
+            CROW_LOG_INFO << "Received signup for user: " << email;
+            auth_controller.signup(email,password);
+            
             // Build response using nlohmann::json (optional)
             json response_json = {
-                {"status", "success"},
-                {"redirect", "/login"}
+                {"status", "success"}
             };
             crow::response res;
             res.code = 200;
